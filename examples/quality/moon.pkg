@@ -1,0 +1,5 @@
+import {
+  "wrMamba/moonlas" @las,
+}
+
+pkgtype(kind: "executable")
