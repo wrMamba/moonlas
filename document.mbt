@@ -100,6 +100,7 @@ pub fn Document::with_points(
   if self.vlrs.length() > limits.max_vlrs {
     raise Limit("VLR budget exceeded")
   }
+  require(h.minor == 4 || h.format <= 3, "format requires LAS 1.4")
   let by_return = Array::make(if h.minor == 4 { 15 } else { 5 }, 0)
   for p in points {
     p.validate(h.format)
