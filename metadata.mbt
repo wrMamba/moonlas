@@ -26,6 +26,9 @@ pub fn read_vlrs(
   limits~ : Limits = Limits::default(),
 ) -> (Array[Vlr], Bytes) raise LasError {
   limits.validate()
+  if data.length() > limits.max_bytes {
+    raise Limit("input byte budget exceeded")
+  }
   if header.vlr_count < 0 || header.vlr_count > limits.max_vlrs {
     raise Limit("VLR budget exceeded")
   }
@@ -78,3 +81,25 @@ pub extend Vlr with @debug.Debug::{to_repr}
 
 ///|
 pub extend Vlr with Eq::{equal, not_equal}
+
+///|
+fn metadata_end(
+  records : Array[Vlr],
+  gap : Bytes,
+  minor : Int32,
+  limits : Limits,
+) -> Int32 raise LasError {
+  let mut size = if minor == 2 { 227 } else { 375 }
+  for v in records {
+    v.validate()
+    let n = 54 + v.payload.length()
+    if n > limits.max_bytes - size {
+      raise Limit("metadata byte budget exceeded")
+    }
+    size += n
+  }
+  if gap.length() > limits.max_bytes - size {
+    raise Limit("gap byte budget exceeded")
+  }
+  size + gap.length()
+}

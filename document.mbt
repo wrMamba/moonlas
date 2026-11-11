@@ -34,6 +34,7 @@ pub fn Document::validate(
 ) -> Unit raise LasError {
   limits.validate()
   let h = self.header
+  validate_header_fields(h)
   h.transform.validate()
   ignore(record_size(h.format))
   require(h.minor == 2 || h.minor == 4, "invalid document version")
@@ -95,6 +96,10 @@ pub fn Document::with_points(
     raise Limit("point budget exceeded")
   }
   let h = self.header
+  require(h.minor == 2 || h.minor == 4, "invalid document version")
+  if self.vlrs.length() > limits.max_vlrs {
+    raise Limit("VLR budget exceeded")
+  }
   let by_return = Array::make(if h.minor == 4 { 15 } else { 5 }, 0)
   for p in points {
     p.validate(h.format)
@@ -110,10 +115,7 @@ pub fn Document::with_points(
     } else {
       points[0].extra.length()
     })
-  let metadata = encode_vlrs(self.vlrs)
-  let offset = (if h.minor == 2 { 227 } else { 375 }) +
-    metadata.length() +
-    self.gap.length()
+  let offset = metadata_end(self.vlrs, self.gap, h.minor, limits)
   let header = {
     ..h,
     point_offset: offset,
