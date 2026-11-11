@@ -1,0 +1,243 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "wrMamba/moonlas"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn create(Array[Point], Int32, Transform, minor? : Int32, vlrs? : Array[Vlr], limits? : Limits) -> Document raise LasError
+
+pub fn decode(Bytes, limits? : Limits) -> Document raise LasError
+
+pub fn encode(Document, limits? : Limits) -> Bytes raise LasError
+
+pub fn open_records(Bytes, limits? : Limits) -> PointCursor raise LasError
+
+pub fn point_bounds(Array[Point], Transform) -> Bounds? raise LasError
+
+pub fn read_header(Bytes, limits? : Limits) -> Header raise LasError
+
+pub fn read_point(Bytes, Int32) -> Point raise LasError
+
+pub fn read_vlrs(Bytes, Header, limits? : Limits) -> (Array[Vlr], Bytes) raise LasError
+
+pub fn record_size(Int32) -> Int32 raise LasError
+
+pub fn vlrs_named(Array[Vlr], String, Int32) -> Array[Vlr]
+
+pub fn write_point(Point, Int32) -> Bytes raise LasError
+
+// Errors
+pub suberror LasError {
+  Truncated(Int32)
+  Limit(String)
+  Invalid(String)
+  Unsupported(String)
+} derive(@debug.Debug)
+pub fn LasError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub(all) struct Audit {
+  count : Int32
+  classifications : Array[Int32]
+  returns : Array[Int32]
+  flags : Array[Int32]
+  bounds : Bounds?
+  intensity_min : Int32
+  intensity_max : Int32
+  intensity_mean : Double
+  issues : Array[String]
+} derive(@debug.Debug)
+pub fn Audit::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Bounds {
+  min : Position
+  max : Position
+} derive(Eq, @debug.Debug)
+pub fn Bounds::contains(Self, Position) -> Bool
+pub fn Bounds::equal(Self, Self) -> Bool
+pub fn Bounds::not_equal(Self, Self) -> Bool
+pub fn Bounds::to_repr(Self) -> @debug.Repr
+pub fn Bounds::validate(Self) -> Unit raise LasError
+
+pub(all) struct Cell {
+  count : Int32
+  ground_count : Int32
+  min_z : Double
+  max_z : Double
+  mean_z : Double
+  mean_intensity : Double
+} derive(Eq, @debug.Debug)
+pub fn Cell::equal(Self, Self) -> Bool
+pub fn Cell::not_equal(Self, Self) -> Bool
+pub fn Cell::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Document {
+  header : Header
+  vlrs : Array[Vlr]
+  gap : Bytes
+  points : Array[Point]
+} derive(@debug.Debug)
+pub fn Document::audit(Self, limits? : Limits) -> Audit raise LasError
+pub fn Document::crop(Self, Bounds, limits? : Limits) -> Self raise LasError
+pub fn Document::elevation_grid(Self, Double, limits? : Limits) -> Grid raise LasError
+pub fn Document::merge(Self, Self, Double, limits? : Limits) -> Self raise LasError
+pub fn Document::requantize(Self, Transform, Double, limits? : Limits) -> Requantized raise LasError
+pub fn Document::select(Self, Selection, limits? : Limits) -> Self raise LasError
+pub fn Document::to_repr(Self) -> @debug.Repr
+pub fn Document::validate(Self, limits? : Limits) -> Unit raise LasError
+pub fn Document::with_points(Self, Array[Point], limits? : Limits) -> Self raise LasError
+pub fn Document::within_radius(Self, Position, Double, limits? : Limits) -> Self raise LasError
+
+pub(all) struct Grid {
+  origin_x : Double
+  origin_y : Double
+  cell_size : Double
+  columns : Int32
+  rows : Int32
+  cells : Array[Cell?]
+} derive(@debug.Debug)
+pub fn Grid::at(Self, Int32, Int32) -> Cell? raise LasError
+pub fn Grid::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Header {
+  minor : Int32
+  file_source_id : Int32
+  global_encoding : Int32
+  project_id : Bytes
+  system : String
+  software : String
+  day : Int32
+  year : Int32
+  point_offset : Int32
+  vlr_count : Int32
+  format : Int32
+  record_length : Int32
+  point_count : Int32
+  by_return : Array[Int32]
+  transform : Transform
+  bounds : (Double, Double, Double, Double, Double, Double)
+} derive(@debug.Debug)
+pub fn Header::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Limits {
+  max_bytes : Int32
+  max_points : Int32
+  max_vlrs : Int32
+  max_cells : Int32
+} derive(Eq, @debug.Debug)
+pub fn Limits::default() -> Self
+pub fn Limits::equal(Self, Self) -> Bool
+pub fn Limits::not_equal(Self, Self) -> Bool
+pub fn Limits::to_repr(Self) -> @debug.Repr
+pub fn Limits::validate(Self) -> Unit raise LasError
+
+pub(all) struct Point {
+  x : Int32
+  y : Int32
+  z : Int32
+  intensity : Int32
+  return_number : Int32
+  returns : Int32
+  classification : Int32
+  flags : Int32
+  scanner_channel : Int32
+  scan_direction : Bool
+  edge : Bool
+  scan_angle : Int32
+  user_data : Int32
+  source_id : Int32
+  gps_time : Double?
+  rgb : (Int32, Int32, Int32)?
+  nir : Int32?
+  extra : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Point::equal(Self, Self) -> Bool
+pub fn Point::new(Int32, Int32, Int32) -> Self
+pub fn Point::not_equal(Self, Self) -> Bool
+pub fn Point::to_repr(Self) -> @debug.Repr
+pub fn Point::validate(Self, Int32) -> Unit raise LasError
+
+pub struct PointCursor {
+  data : Bytes
+  header : Header
+  mut index : Int32
+}
+pub fn PointCursor::batch(Self, Int32) -> Array[Point] raise LasError
+pub fn PointCursor::header(Self) -> Header
+pub fn PointCursor::next(Self) -> Point? raise LasError
+pub fn PointCursor::position(Self) -> Int32
+pub fn PointCursor::remaining(Self) -> Int32
+pub fn PointCursor::seek(Self, Int32) -> Unit raise LasError
+
+pub(all) struct Position {
+  x : Double
+  y : Double
+  z : Double
+} derive(Eq, @debug.Debug)
+pub fn Position::equal(Self, Self) -> Bool
+pub fn Position::not_equal(Self, Self) -> Bool
+pub fn Position::to_repr(Self) -> @debug.Repr
+pub fn Position::validate(Self) -> Unit raise LasError
+
+pub(all) struct Requantized {
+  document : Document
+  max_error : Position
+} derive(@debug.Debug)
+pub fn Requantized::to_repr(Self) -> @debug.Repr
+
+pub(all) enum ReturnMode {
+  Any
+  First
+  Last
+  Single
+} derive(Eq, @debug.Debug)
+pub fn ReturnMode::equal(Self, Self) -> Bool
+pub fn ReturnMode::not_equal(Self, Self) -> Bool
+pub fn ReturnMode::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Selection {
+  classifications : Array[Int32]
+  source_ids : Array[Int32]
+  min_intensity : Int32
+  max_intensity : Int32
+  return_mode : ReturnMode
+  include_withheld : Bool
+  gps_min : Double?
+  gps_max : Double?
+} derive(@debug.Debug)
+pub fn Selection::all() -> Self
+pub fn Selection::to_repr(Self) -> @debug.Repr
+pub fn Selection::validate(Self) -> Unit raise LasError
+
+pub(all) struct Transform {
+  sx : Double
+  sy : Double
+  sz : Double
+  ox : Double
+  oy : Double
+  oz : Double
+} derive(Eq, @debug.Debug)
+pub fn Transform::equal(Self, Self) -> Bool
+pub fn Transform::new(Double) -> Self raise LasError
+pub fn Transform::not_equal(Self, Self) -> Bool
+pub fn Transform::position(Self, Point) -> Position raise LasError
+pub fn Transform::quantize(Self, Position, Point) -> Point raise LasError
+pub fn Transform::to_repr(Self) -> @debug.Repr
+pub fn Transform::validate(Self) -> Unit raise LasError
+
+pub(all) struct Vlr {
+  user_id : String
+  record_id : Int32
+  description : String
+  payload : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Vlr::equal(Self, Self) -> Bool
+pub fn Vlr::not_equal(Self, Self) -> Bool
+pub fn Vlr::to_repr(Self) -> @debug.Repr
+pub fn Vlr::validate(Self) -> Unit raise LasError
+
+// Type aliases
+
+// Traits
