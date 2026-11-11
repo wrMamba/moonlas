@@ -1,6 +1,8 @@
 ///|
 /// Recoverable input errors carry a byte offset where available.
 pub suberror LasError {
+  Truncated(Int32)
+  Limit(String)
   Invalid(String)
   Unsupported(String)
 } derive(Debug)
