@@ -1,0 +1,73 @@
+{
+  "seed": 20261111,
+  "laspy": "2.6.1",
+  "numpy": "2.2.6",
+  "cases": [
+    {
+      "minor": 2,
+      "format": 0,
+      "records": 32,
+      "bytes": 1249
+    },
+    {
+      "minor": 4,
+      "format": 0,
+      "records": 32,
+      "bytes": 1397
+    },
+    {
+      "minor": 2,
+      "format": 1,
+      "records": 32,
+      "bytes": 1505
+    },
+    {
+      "minor": 4,
+      "format": 1,
+      "records": 32,
+      "bytes": 1653
+    },
+    {
+      "minor": 2,
+      "format": 2,
+      "records": 32,
+      "bytes": 1441
+    },
+    {
+      "minor": 4,
+      "format": 2,
+      "records": 32,
+      "bytes": 1589
+    },
+    {
+      "minor": 2,
+      "format": 3,
+      "records": 32,
+      "bytes": 1697
+    },
+    {
+      "minor": 4,
+      "format": 3,
+      "records": 32,
+      "bytes": 1845
+    },
+    {
+      "minor": 4,
+      "format": 6,
+      "records": 32,
+      "bytes": 1717
+    },
+    {
+      "minor": 4,
+      "format": 7,
+      "records": 32,
+      "bytes": 1909
+    },
+    {
+      "minor": 4,
+      "format": 8,
+      "records": 32,
+      "bytes": 1973
+    }
+  ]
+}

@@ -24,9 +24,9 @@ pub fn encode(
   put32(out, h.vlr_count)
   put8(out, h.format)
   put16(out, h.record_length)
-  put32(out, if h.format < 6 { h.point_count } else { 0 })
+  put32(out, if h.minor == 2 { h.point_count } else { 0 })
   for i in 0..<5 {
-    put32(out, if h.format < 6 { h.by_return[i] } else { 0 })
+    put32(out, if h.minor == 2 { h.by_return[i] } else { 0 })
   }
   let t = h.transform
   for value in [t.sx, t.sy, t.sz, t.ox, t.oy, t.oz] {

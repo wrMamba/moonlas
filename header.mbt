@@ -91,7 +91,7 @@ pub fn read_header(
         legacy_count == 0 && legacy_returns.all(x => x == 0),
         "LAS 1.4 formats require zero legacy counts",
       )
-    } else {
+    } else if legacy_count != 0 || !legacy_returns.all(x => x == 0) {
       require(
         legacy_count == point_count,
         "legacy and extended point counts disagree",
