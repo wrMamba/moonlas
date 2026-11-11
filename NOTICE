@@ -1,0 +1,9 @@
+MoonLAS is an original MoonBit implementation of a deliberately bounded LAS subset.
+Behavioral reference: laspy, https://github.com/laspy/laspy, BSD-3-Clause.
+Inspected reference revision: b4e14088d24e7e23f72fd9d33d61f63a9668cb74
+Files inspected: laspy/header.py, laspy/point/dims.py, LICENSE.txt.
+No implementation, upstream tests or datasets are copied or vendored.
+The optional oracle generator calls laspy 2.6.1 and numpy 2.2.6 on original
+synthetic data; these tools are not runtime dependencies of the MoonBit package.
+MoonBit core is supplied by the official pinned toolchain; no code is vendored.
+LAS is an ASPRS format; use of its name does not imply certification or endorsement.

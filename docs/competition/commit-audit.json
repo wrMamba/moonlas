@@ -1,0 +1,212 @@
+{
+  "conservative_engineering_commits": 21,
+  "excluded_later_documentation_or_format_repairs": true,
+  "commits": [
+    {
+      "commit": "ddf57ba8026dfae1ef2050e857967f4d294cd537",
+      "purpose": "feat: define validated LAS point attributes and resource budgets",
+      "paths": [
+        ".gitignore",
+        "model.mbt",
+        "model_wbtest.mbt",
+        "moon.mod",
+        "moon.pkg"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "e42d05d9c668a47d29bfe8ed08ac2ed8cd723328",
+      "purpose": "feat: add bounded little-endian readers and safe length arithmetic",
+      "paths": [
+        "binary.mbt",
+        "binary_wbtest.mbt",
+        "model.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "81736fd1158e34189ccc0155cc7de95e5013db1f",
+      "purpose": "feat: serialize exact integer floating-point and fixed-width metadata fields",
+      "paths": [
+        "writer.mbt",
+        "writer_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "cd55004b7981cbd15e4cbf6606316a75f600db51",
+      "purpose": "feat: parse LAS 1.2 and 1.4 headers with count and version constraints",
+      "paths": [
+        "header.mbt",
+        "header_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "e0a95c5e939ee5f9243374f4c9f51027cbd028c8",
+      "purpose": "feat: retain bounded VLR payloads and pre-point padding",
+      "paths": [
+        "metadata.mbt",
+        "metadata_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "9c4e6e08cf914ab1dd60182fad4ff7cb246b3f78",
+      "purpose": "feat: decode legacy and extended LAS point attribute bitfields",
+      "paths": [
+        "point_read.mbt",
+        "point_read_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "984e185614fb2551648b3914460318c6ef5a580e",
+      "purpose": "feat: write seven LAS point formats without attribute loss",
+      "paths": [
+        "point_write.mbt",
+        "point_write_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "15a06bc497dfd06b4b89f76aabc6175e9c6f02ac",
+      "purpose": "feat: transform scaled coordinates with explicit quantization and finite bounds",
+      "paths": [
+        "coordinates.mbt",
+        "coordinates_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "d50f7c8caf34f0b479632392e90ea6556018209f",
+      "purpose": "feat: assemble validated documents and recompute point extents and counts",
+      "paths": [
+        "document.mbt",
+        "document_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "1f7b9c7620ce164bff4dea37e0602e83125e165e",
+      "purpose": "feat: serialize complete LAS documents with bounded metadata and canonical headers",
+      "paths": [
+        "document.mbt",
+        "encode.mbt",
+        "encode_wbtest.mbt",
+        "metadata.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "e072bb2e70ea0cf7740ea12709f77b38eabf4376",
+      "purpose": "feat: audit classification return flags intensity and stale header summaries",
+      "paths": [
+        "audit.mbt",
+        "audit_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "cbed35cd8c65433a09163a868c67f887d9585554",
+      "purpose": "feat: filter LAS attributes with stable ordering and metadata preservation",
+      "paths": [
+        "selection.mbt",
+        "selection_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "3cdf7afac3b78518acd54ef63e9ce227ce916a6b",
+      "purpose": "feat: crop scaled LAS coordinates by inclusive bounds and overflow-safe radius",
+      "paths": [
+        "spatial.mbt",
+        "spatial_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "3ede29b07dc90e3ff37452566683de213b7a3aa4",
+      "purpose": "feat: aggregate bounded elevation grids with empty-cell and ground-class semantics",
+      "paths": [
+        "grid.mbt",
+        "grid_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "a8a3b02f5fd58b05e1ade91f223825f56b5a1bef",
+      "purpose": "feat: requantize coordinates with explicit tolerance and measured axis errors",
+      "paths": [
+        "requantize.mbt",
+        "requantize_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "98dd0c0e43cead96e031a268a0528b17180e39fa",
+      "purpose": "feat: merge compatible LAS tiles without hiding metadata or quantization conflicts",
+      "paths": [
+        "merge.mbt",
+        "merge_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "73ba20d0844064e8f13292413ce9565b5fb632bf",
+      "purpose": "feat: decode bounded LAS records on demand with seekable batch cursors",
+      "paths": [
+        "cursor.mbt",
+        "cursor_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "3fdb6c1414a9a9bd484948e932332248bb0eeab7",
+      "purpose": "test: cross-check 352 records and canonical writes against pinned laspy oracles",
+      "paths": [
+        "encode.mbt",
+        "header.mbt",
+        "reference_wbtest.mbt",
+        "tools/generate_oracles.py",
+        "tools/oracle-manifest.json"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "afe4a05f42fdcc8311b7187f71862fbb6a877899",
+      "purpose": "test: harden truncation budgets and mutated documents with 1792 record properties",
+      "paths": [
+        "document.mbt",
+        "robustness_wbtest.mbt"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "01f3b8001dd602e6bb5d291173d4bbc8feae8df4",
+      "purpose": "feat: demonstrate acquisition QC terrain gridding and batched sensor ingestion",
+      "paths": [
+        "examples/ingest/main.mbt",
+        "examples/ingest/moon.pkg",
+        "examples/ingest/pkg.generated.mbti",
+        "examples/quality/main.mbt",
+        "examples/quality/moon.pkg",
+        "examples/quality/pkg.generated.mbti",
+        "examples/terrain/main.mbt",
+        "examples/terrain/moon.pkg",
+        "examples/terrain/pkg.generated.mbti"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    },
+    {
+      "commit": "2da803418b0de529cdb7ee01a279da32daf51ffc",
+      "purpose": "ci: reproduce strict four-backend workflows and independent oracle regeneration",
+      "paths": [
+        ".github/workflows/ci.yml",
+        "pkg.generated.mbti",
+        "tools/audit_source.py"
+      ],
+      "validation": "对应源码/测试和最终HEAD严格回归；历史SHA不冒充全量45测试已执行"
+    }
+  ]
+}
