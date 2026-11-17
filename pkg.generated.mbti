@@ -12,6 +12,10 @@ pub fn decode(Bytes, limits? : Limits) -> Document raise LasError
 
 pub fn encode(Document, limits? : Limits) -> Bytes raise LasError
 
+pub fn extra_dimensions(Array[Vlr], Int32) -> Array[ExtraDimension] raise LasError
+
+pub fn extra_values(Point, ExtraDimension) -> Array[ExtraValue] raise LasError
+
 pub fn open_records(Bytes, limits? : Limits) -> PointCursor raise LasError
 
 pub fn point_bounds(Array[Point], Transform) -> Bounds? raise LasError
@@ -25,6 +29,8 @@ pub fn read_vlrs(Bytes, Header, limits? : Limits) -> (Array[Vlr], Bytes) raise L
 pub fn record_size(Int32) -> Int32 raise LasError
 
 pub fn vlrs_named(Array[Vlr], String, Int32) -> Array[Vlr]
+
+pub fn waveform_descriptor(Vlr) -> WaveformDescriptor raise LasError
 
 pub fn write_point(Point, Int32) -> Bytes raise LasError
 
@@ -78,17 +84,61 @@ pub(all) struct Document {
   vlrs : Array[Vlr]
   gap : Bytes
   points : Array[Point]
+  tail : Bytes
 } derive(@debug.Debug)
 pub fn Document::audit(Self, limits? : Limits) -> Audit raise LasError
 pub fn Document::crop(Self, Bounds, limits? : Limits) -> Self raise LasError
 pub fn Document::elevation_grid(Self, Double, limits? : Limits) -> Grid raise LasError
+pub fn Document::evlrs(Self, limits? : Limits) -> Array[Evlr] raise LasError
 pub fn Document::merge(Self, Self, Double, limits? : Limits) -> Self raise LasError
+pub fn Document::projection_records(Self, limits? : Limits) -> Array[ProjectionRecord] raise LasError
 pub fn Document::requantize(Self, Transform, Double, limits? : Limits) -> Requantized raise LasError
 pub fn Document::select(Self, Selection, limits? : Limits) -> Self raise LasError
 pub fn Document::to_repr(Self) -> @debug.Repr
 pub fn Document::validate(Self, limits? : Limits) -> Unit raise LasError
+pub fn Document::waveform_packet(Self, Point, external? : Bytes?, limits? : Limits) -> Bytes raise LasError
+pub fn Document::waveform_samples(Self, Point, external? : Bytes?, limits? : Limits) -> Array[Double] raise LasError
+pub fn Document::with_evlrs(Self, Array[Evlr], limits? : Limits) -> Self raise LasError
 pub fn Document::with_points(Self, Array[Point], limits? : Limits) -> Self raise LasError
 pub fn Document::within_radius(Self, Position, Double, limits? : Limits) -> Self raise LasError
+
+pub(all) struct Evlr {
+  user_id : String
+  record_id : Int32
+  description : String
+  payload : Bytes
+  reserved : Int32
+  raw_text : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Evlr::equal(Self, Self) -> Bool
+pub fn Evlr::new(String, Int32, String, Bytes) -> Self
+pub fn Evlr::not_equal(Self, Self) -> Bool
+pub fn Evlr::to_repr(Self) -> @debug.Repr
+pub fn Evlr::validate(Self) -> Unit raise LasError
+
+pub(all) struct ExtraDimension {
+  name : String
+  description : String
+  data_type : Int32
+  options : Int32
+  byte_offset : Int32
+  byte_width : Int32
+  no_data : Bytes
+  minimum : Bytes
+  maximum : Bytes
+  scale : Array[Double]
+  offset : Array[Double]
+} derive(@debug.Debug)
+pub fn ExtraDimension::to_repr(Self) -> @debug.Repr
+
+pub(all) enum ExtraValue {
+  Unsigned(UInt64)
+  Signed(Int64)
+  Real(Double)
+} derive(Eq, @debug.Debug)
+pub fn ExtraValue::equal(Self, Self) -> Bool
+pub fn ExtraValue::not_equal(Self, Self) -> Bool
+pub fn ExtraValue::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Grid {
   origin_x : Double
@@ -118,6 +168,12 @@ pub(all) struct Header {
   by_return : Array[Int32]
   transform : Transform
   bounds : (Double, Double, Double, Double, Double, Double)
+  extra : Bytes
+  raw_text : Bytes
+  waveform_offset : Int32
+  evlr_offset : Int32
+  evlr_count : Int32
+  legacy_counts : Bool
 } derive(@debug.Debug)
 pub fn Header::to_repr(Self) -> @debug.Repr
 
@@ -152,6 +208,7 @@ pub(all) struct Point {
   rgb : (Int32, Int32, Int32)?
   nir : Int32?
   extra : Bytes
+  waveform : Waveform?
 } derive(Eq, @debug.Debug)
 pub fn Point::equal(Self, Self) -> Bool
 pub fn Point::new(Int32, Int32, Int32) -> Self
@@ -180,6 +237,15 @@ pub fn Position::equal(Self, Self) -> Bool
 pub fn Position::not_equal(Self, Self) -> Bool
 pub fn Position::to_repr(Self) -> @debug.Repr
 pub fn Position::validate(Self) -> Unit raise LasError
+
+pub(all) struct ProjectionRecord {
+  record_id : Int32
+  extended : Bool
+  payload : Bytes
+} derive(Eq, @debug.Debug)
+pub fn ProjectionRecord::equal(Self, Self) -> Bool
+pub fn ProjectionRecord::not_equal(Self, Self) -> Bool
+pub fn ProjectionRecord::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Requantized {
   document : Document
@@ -232,11 +298,40 @@ pub(all) struct Vlr {
   record_id : Int32
   description : String
   payload : Bytes
+  reserved : Int32
+  raw_text : Bytes
 } derive(Eq, @debug.Debug)
 pub fn Vlr::equal(Self, Self) -> Bool
+pub fn Vlr::new(String, Int32, String, Bytes) -> Self
 pub fn Vlr::not_equal(Self, Self) -> Bool
 pub fn Vlr::to_repr(Self) -> @debug.Repr
 pub fn Vlr::validate(Self) -> Unit raise LasError
+
+pub(all) struct Waveform {
+  descriptor_index : Int32
+  byte_offset : UInt64
+  packet_size : UInt32
+  location : Float
+  dx : Float
+  dy : Float
+  dz : Float
+} derive(Eq, @debug.Debug)
+pub fn Waveform::equal(Self, Self) -> Bool
+pub fn Waveform::not_equal(Self, Self) -> Bool
+pub fn Waveform::to_repr(Self) -> @debug.Repr
+pub fn Waveform::validate(Self) -> Unit raise LasError
+
+pub(all) struct WaveformDescriptor {
+  bits_per_sample : Int32
+  compression : Int32
+  sample_count : UInt32
+  spacing_ps : UInt32
+  gain : Double
+  offset : Double
+} derive(Eq, @debug.Debug)
+pub fn WaveformDescriptor::equal(Self, Self) -> Bool
+pub fn WaveformDescriptor::not_equal(Self, Self) -> Bool
+pub fn WaveformDescriptor::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

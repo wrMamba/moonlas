@@ -102,7 +102,6 @@ fn Reader::text(self : Reader, width : Int32) -> String raise LasError {
       ended = true
     }
     if !ended {
-      require(n >= 32 && n <= 126, "metadata text must be printable ASCII")
       chars.push(n.unsafe_to_char())
     }
   }
@@ -120,4 +119,38 @@ fn checked_size(
   if count > available / width {
     raise Truncated(available)
   }
+}
+
+///|
+fn Reader::uint64(self : Reader) -> UInt64 raise LasError {
+  let mut value : UInt64 = 0UL
+  for i in 0..<8 {
+    value = value | (self.u8().to_uint64() << (8 * i))
+  }
+  value
+}
+
+///|
+fn Reader::float32(self : Reader) -> Float raise LasError {
+  Float::reinterpret_from_int(self.i32())
+}
+
+///|
+fn slice_bytes(
+  data : Bytes,
+  start : Int32,
+  count : Int32,
+) -> Bytes raise LasError {
+  let r = Reader::new(data, start, data.length())
+  r.take(count)
+}
+
+///|
+fn fixed_text(data : Bytes) -> String raise LasError {
+  Reader::new(data, 0, data.length()).text(data.length())
+}
+
+///|
+fn Reader::float64_raw(self : Reader) -> Double raise LasError {
+  self.uint64().reinterpret_as_int64().reinterpret_as_double()
 }

@@ -14,11 +14,8 @@ pub fn open_records(
 ) -> PointCursor raise LasError {
   let header = read_header(data, limits~)
   ignore(read_vlrs(data, header, limits~))
-  require(
-    data.length() - header.point_offset ==
-    header.point_count * header.record_length,
-    "trailing bytes after point records",
-  )
+  let end = point_end(header)
+  validate_tail(header, slice_bytes(data, end, data.length() - end), limits)
   { data, header, index: 0, }
 }
 

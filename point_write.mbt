@@ -37,6 +37,9 @@ pub fn write_point(point : Point, format : Int32) -> Bytes raise LasError {
   if point.nir is Some(nir) {
     put16(out, nir)
   }
+  if point.waveform is Some(w) {
+    write_waveform(out, w)
+  }
   append(out, point.extra)
   bytes_of(out)
 }

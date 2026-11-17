@@ -1,6 +1,8 @@
 ///|
 test "complete documents preserve seven formats UUID VLRs padding and extras" {
   let vlr : Vlr = {
+    reserved: 0,
+    raw_text: b"",
     user_id: "example",
     record_id: 9,
     description: "opaque",

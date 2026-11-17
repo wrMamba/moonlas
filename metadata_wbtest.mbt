@@ -1,7 +1,9 @@
 ///|
 test "opaque VLR and gap preservation" {
-  let records = [
+  let records : Array[Vlr] = [
     {
+      reserved: 0,
+      raw_text: b"",
       user_id: "LASF_Projection",
       record_id: 2112,
       description: "CRS",
@@ -34,7 +36,9 @@ test "VLR span and field width failures" {
       _ => true
     },
   )
-  let v = {
+  let v : Vlr = {
+    reserved: 0,
+    raw_text: b"",
     user_id: "12345678901234567",
     record_id: 1,
     description: "",

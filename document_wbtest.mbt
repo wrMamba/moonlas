@@ -15,16 +15,9 @@ test "create recomputes extents returns and exact record width" {
 }
 
 ///|
-test "decode empty files and reject trailing bytes" {
+test "decode empty files and retain trailing bytes" {
   assert_eq(decode(header_fixture(2, 0)).points.length(), 0)
   let a = header_fixture(2, 0).to_array()
   append(a, b"x")
-  assert_true(
-    try {
-      ignore(decode(bytes_of(a)))
-      false
-    } catch {
-      _ => true
-    },
-  )
+  assert_eq(decode(bytes_of(a)).tail, b"x")
 }

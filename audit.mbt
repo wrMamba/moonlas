@@ -20,7 +20,7 @@ pub fn Document::audit(
 ) -> Audit raise LasError {
   self.validate(limits~)
   let classifications = Array::make(256, 0)
-  let returns = Array::make(if self.header.minor == 2 { 5 } else { 15 }, 0)
+  let returns = Array::make(if self.header.minor == 4 { 15 } else { 5 }, 0)
   let flags = Array::make(4, 0)
   let mut low = 65535
   let mut high = 0

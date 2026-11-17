@@ -15,18 +15,18 @@ pub fn encode(
   append(out, h.project_id)
   put8(out, 1)
   put8(out, h.minor)
-  put_text(out, h.system, 32)
-  put_text(out, h.software, 32)
+  put_preserved_text(out, h.system, 32, raw_part(h.raw_text, 0, 32))
+  put_preserved_text(out, h.software, 32, raw_part(h.raw_text, 32, 32))
   put16(out, h.day)
   put16(out, h.year)
-  put16(out, if h.minor == 2 { 227 } else { 375 })
+  put16(out, base_header_size(h.minor) + h.extra.length())
   put32(out, h.point_offset)
   put32(out, h.vlr_count)
   put8(out, h.format)
   put16(out, h.record_length)
-  put32(out, if h.minor == 2 { h.point_count } else { 0 })
+  put32(out, if h.format < 6 && h.legacy_counts { h.point_count } else { 0 })
   for i in 0..<5 {
-    put32(out, if h.minor == 2 { h.by_return[i] } else { 0 })
+    put32(out, if h.format < 6 && h.legacy_counts { h.by_return[i] } else { 0 })
   }
   let t = h.transform
   for value in [t.sx, t.sy, t.sz, t.ox, t.oy, t.oz] {
@@ -36,20 +36,24 @@ pub fn encode(
   for value in [xmax, xmin, ymax, ymin, zmax, zmin] {
     putf64(out, value)
   }
+  if h.minor >= 3 {
+    put64(out, h.waveform_offset)
+  }
   if h.minor == 4 {
-    put64(out, 0)
-    put64(out, 0)
-    put32(out, 0)
+    put64(out, h.evlr_offset)
+    put32(out, h.evlr_count)
     put64(out, h.point_count)
     for count in h.by_return {
       put64(out, count)
     }
   }
+  append(out, h.extra)
   append(out, encode_vlrs(canonical.vlrs))
   append(out, canonical.gap)
   for p in canonical.points {
     append(out, write_point(p, h.format))
   }
+  append(out, canonical.tail)
   bytes_of(out)
 }
 
@@ -63,21 +67,30 @@ fn validate_header_fields(h : Header) -> Unit raise LasError {
     h.day >= 0 && h.day <= 366 && h.year >= 0 && h.year <= 65535,
     "invalid creation date",
   )
-  let allowed = if h.minor == 2 { 1 } else { 25 }
+  validate_version_format(h.minor, h.format)
+  let allowed = encoding_mask(h.minor)
   require(
     h.global_encoding >= 0 && (h.global_encoding & allowed) == h.global_encoding,
     "unsupported global encoding bits",
   )
   require(
-    h.by_return.length() == (if h.minor == 2 { 5 } else { 15 }),
+    h.by_return.length() == (if h.minor == 4 { 15 } else { 5 }),
     "invalid return histogram length",
   )
   for n in h.by_return {
     require(n >= 0, "negative return histogram")
   }
+  require(
+    (h.global_encoding & 6) != 6,
+    "internal and external waveform bits are mutually exclusive",
+  )
+  require(
+    h.raw_text.is_empty() || h.raw_text.length() == 64,
+    "invalid header text bytes",
+  )
   let probe : Array[Byte] = []
-  put_text(probe, h.system, 32)
-  put_text(probe, h.software, 32)
+  put_preserved_text(probe, h.system, 32, raw_part(h.raw_text, 0, 32))
+  put_preserved_text(probe, h.software, 32, raw_part(h.raw_text, 32, 32))
   let (x, y, z, xx, yy, zz) = h.bounds
   for v in [x, y, z, xx, yy, zz] {
     require(finite(v), "nonfinite header bounds")

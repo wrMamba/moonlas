@@ -34,17 +34,23 @@ pub fn read_point(data : Bytes, format : Int32) -> Point raise LasError {
     user_data = r.u8()
   }
   let source_id = r.u16()
-  let gps_time = if format == 1 || format == 3 || modern {
-    Some(r.f64())
-  } else {
-    None
-  }
-  let rgb = if format == 2 || format == 3 || format == 7 || format == 8 {
+  let gps_time = if format == 1 || format >= 3 { Some(r.f64()) } else { None }
+  let rgb = if format == 2 ||
+    format == 3 ||
+    format == 5 ||
+    format == 7 ||
+    format == 8 ||
+    format == 10 {
     Some((r.u16(), r.u16(), r.u16()))
   } else {
     None
   }
-  let nir = if format == 8 { Some(r.u16()) } else { None }
+  let nir = if format == 8 || format == 10 { Some(r.u16()) } else { None }
+  let waveform = if has_waveform(format) {
+    Some(read_waveform(r))
+  } else {
+    None
+  }
   let extra = r.take(r.end - r.pos)
   let point = {
     x,
@@ -65,6 +71,7 @@ pub fn read_point(data : Bytes, format : Int32) -> Point raise LasError {
     rgb,
     nir,
     extra,
+    waveform,
   }
   point.validate(format)
   point

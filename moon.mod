@@ -1,6 +1,6 @@
 name = "wrMamba/moonlas"
 
-version = "0.1.0"
+version = "0.2.0"
 
 readme = "README.md"
 
@@ -10,4 +10,4 @@ license = "MIT"
 
 keywords = [ "las", "lidar", "point-cloud", "geospatial" ]
 
-description = "Bounded LAS point-record IO, metadata-preserving filtering and elevation grids in pure MoonBit"
+description = "LAS 1.1-1.4 point IO, waveform access, metadata-preserving filtering and elevation grids in MoonBit"

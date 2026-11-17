@@ -10,7 +10,7 @@ test "point and budget model" {
 test "invalid point formats and scales" {
   assert_true(
     try {
-      ignore(record_size(4))
+      ignore(record_size(11))
       false
     } catch {
       _ => true

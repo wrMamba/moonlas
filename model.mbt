@@ -76,7 +76,7 @@ pub fn Transform::new(scale : Double) -> Transform raise LasError {
 ///|
 pub fn Transform::validate(self : Transform) -> Unit raise LasError {
   for s in [self.sx, self.sy, self.sz] {
-    require(finite(s) && s > 0.0, "scale must be finite and positive")
+    require(finite(s) && s != 0.0, "scale must be finite and nonzero")
   }
   for o in [self.ox, self.oy, self.oz] {
     require(finite(o), "offset must be finite")
@@ -104,6 +104,7 @@ pub(all) struct Point {
   rgb : (Int32, Int32, Int32)?
   nir : Int32?
   extra : Bytes
+  waveform : Waveform?
 } derive(Debug, Eq)
 
 ///|
@@ -127,6 +128,7 @@ pub fn Point::new(x : Int32, y : Int32, z : Int32) -> Point {
     rgb: None,
     nir: None,
     extra: b"",
+    waveform: None,
   }
 }
 
@@ -137,9 +139,13 @@ pub fn record_size(format : Int32) -> Int32 raise LasError {
     1 => 28
     2 => 26
     3 => 34
+    4 => 57
+    5 => 63
     6 => 30
     7 => 36
     8 => 38
+    9 => 59
+    10 => 67
     _ => raise Unsupported("point format: \{format}")
   }
 }
@@ -147,7 +153,7 @@ pub fn record_size(format : Int32) -> Int32 raise LasError {
 ///|
 pub fn Point::validate(self : Point, format : Int32) -> Unit raise LasError {
   ignore(record_size(format))
-  let old = format <= 3
+  let old = format < 6
   let cap = if old { 5 } else { 15 }
   require(
     self.return_number >= 1 &&
@@ -180,12 +186,17 @@ pub fn Point::validate(self : Point, format : Int32) -> Unit raise LasError {
     self.source_id >= 0 && self.source_id <= 65535,
     "invalid point source ID",
   )
-  let gps = format == 1 || format == 3 || format >= 6
+  let gps = format == 1 || format >= 3
   require((self.gps_time is Some(_)) == gps, "GPS field disagrees with format")
   if self.gps_time is Some(t) {
     require(finite(t), "nonfinite GPS time")
   }
-  let color = format == 2 || format == 3 || format == 7 || format == 8
+  let color = format == 2 ||
+    format == 3 ||
+    format == 5 ||
+    format == 7 ||
+    format == 8 ||
+    format == 10
   require((self.rgb is Some(_)) == color, "RGB field disagrees with format")
   if self.rgb is Some((r, g, b)) {
     for c in [r, g, b] {
@@ -193,9 +204,16 @@ pub fn Point::validate(self : Point, format : Int32) -> Unit raise LasError {
     }
   }
   require(
-    (self.nir is Some(_)) == (format == 8),
+    (self.nir is Some(_)) == (format == 8 || format == 10),
     "NIR field disagrees with format",
   )
+  require(
+    (self.waveform is Some(_)) == has_waveform(format),
+    "waveform field disagrees with format",
+  )
+  if self.waveform is Some(w) {
+    w.validate()
+  }
   if self.nir is Some(n) {
     require(n >= 0 && n <= 65535, "invalid NIR value")
   }

@@ -4,70 +4,142 @@
   "numpy": "2.2.6",
   "cases": [
     {
+      "minor": 1,
+      "format": 0,
+      "records": 32,
+      "bytes": 1272
+    },
+    {
       "minor": 2,
       "format": 0,
       "records": 32,
-      "bytes": 1249
+      "bytes": 1272
+    },
+    {
+      "minor": 3,
+      "format": 0,
+      "records": 32,
+      "bytes": 1280
     },
     {
       "minor": 4,
       "format": 0,
       "records": 32,
-      "bytes": 1397
+      "bytes": 1493
+    },
+    {
+      "minor": 1,
+      "format": 1,
+      "records": 32,
+      "bytes": 1528
     },
     {
       "minor": 2,
       "format": 1,
       "records": 32,
-      "bytes": 1505
+      "bytes": 1528
+    },
+    {
+      "minor": 3,
+      "format": 1,
+      "records": 32,
+      "bytes": 1536
     },
     {
       "minor": 4,
       "format": 1,
       "records": 32,
-      "bytes": 1653
+      "bytes": 1749
     },
     {
       "minor": 2,
       "format": 2,
       "records": 32,
-      "bytes": 1441
+      "bytes": 1464
+    },
+    {
+      "minor": 3,
+      "format": 2,
+      "records": 32,
+      "bytes": 1472
     },
     {
       "minor": 4,
       "format": 2,
       "records": 32,
-      "bytes": 1589
+      "bytes": 1685
     },
     {
       "minor": 2,
       "format": 3,
       "records": 32,
-      "bytes": 1697
+      "bytes": 1720
+    },
+    {
+      "minor": 3,
+      "format": 3,
+      "records": 32,
+      "bytes": 1728
     },
     {
       "minor": 4,
       "format": 3,
       "records": 32,
-      "bytes": 1845
+      "bytes": 1941
+    },
+    {
+      "minor": 3,
+      "format": 4,
+      "records": 32,
+      "bytes": 2544
+    },
+    {
+      "minor": 4,
+      "format": 4,
+      "records": 32,
+      "bytes": 2757
+    },
+    {
+      "minor": 3,
+      "format": 5,
+      "records": 32,
+      "bytes": 2736
+    },
+    {
+      "minor": 4,
+      "format": 5,
+      "records": 32,
+      "bytes": 2949
     },
     {
       "minor": 4,
       "format": 6,
       "records": 32,
-      "bytes": 1717
+      "bytes": 1900
     },
     {
       "minor": 4,
       "format": 7,
       "records": 32,
-      "bytes": 1909
+      "bytes": 2092
     },
     {
       "minor": 4,
       "format": 8,
       "records": 32,
-      "bytes": 1973
+      "bytes": 2156
+    },
+    {
+      "minor": 4,
+      "format": 9,
+      "records": 32,
+      "bytes": 2908
+    },
+    {
+      "minor": 4,
+      "format": 10,
+      "records": 32,
+      "bytes": 3164
     }
   ]
 }

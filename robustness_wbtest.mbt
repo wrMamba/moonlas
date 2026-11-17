@@ -44,7 +44,14 @@ test "unsigned high words reserved fields and resource limits reject" {
     },
   )
   let with_vlr = create([], 0, Transform::new(1.0), vlrs=[
-    { user_id: "x", record_id: 1, description: "x", payload: b"a", },
+    {
+      reserved: 0,
+      raw_text: b"",
+      user_id: "x",
+      record_id: 1,
+      description: "x",
+      payload: b"a",
+    },
   ])
   assert_true(
     try {
@@ -75,7 +82,7 @@ test "mutated modern format in legacy document fails before histogram indexing" 
 
 ///|
 test "deterministic point property matrix covers int32 extremes and all flag bits" {
-  for f in [0, 1, 2, 3, 6, 7, 8] {
+  for f in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] {
     for i in 0..<256 {
       let old = f < 6
       let cap = if old { 5 } else { 15 }

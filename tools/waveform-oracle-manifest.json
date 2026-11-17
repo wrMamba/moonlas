@@ -1,0 +1,102 @@
+{
+  "laspy": "2.6.1",
+  "numpy": "2.2.6",
+  "cases": [
+    {
+      "minor": 3,
+      "format": 4,
+      "storage": "external",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 850
+    },
+    {
+      "minor": 3,
+      "format": 4,
+      "storage": "internal",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 942
+    },
+    {
+      "minor": 3,
+      "format": 5,
+      "storage": "external",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 898
+    },
+    {
+      "minor": 3,
+      "format": 5,
+      "storage": "internal",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 990
+    },
+    {
+      "minor": 4,
+      "format": 4,
+      "storage": "external",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 1234
+    },
+    {
+      "minor": 4,
+      "format": 4,
+      "storage": "internal",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 1326
+    },
+    {
+      "minor": 4,
+      "format": 5,
+      "storage": "external",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 1282
+    },
+    {
+      "minor": 4,
+      "format": 5,
+      "storage": "internal",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 1374
+    },
+    {
+      "minor": 4,
+      "format": 9,
+      "storage": "external",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 1250
+    },
+    {
+      "minor": 4,
+      "format": 9,
+      "storage": "internal",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 1342
+    },
+    {
+      "minor": 4,
+      "format": 10,
+      "storage": "external",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 1314
+    },
+    {
+      "minor": 4,
+      "format": 10,
+      "storage": "internal",
+      "records": 8,
+      "filtered_records": 3,
+      "bytes": 1406
+    }
+  ]
+}

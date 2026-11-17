@@ -17,6 +17,12 @@ pub(all) struct Header {
   by_return : Array[Int32]
   transform : Transform
   bounds : (Double, Double, Double, Double, Double, Double)
+  extra : Bytes
+  raw_text : Bytes
+  waveform_offset : Int32
+  evlr_offset : Int32
+  evlr_count : Int32
+  legacy_counts : Bool
 } derive(Debug)
 
 ///|
@@ -35,9 +41,10 @@ pub fn read_header(
   let project_id = r.take(16)
   let major = r.u8()
   let minor = r.u8()
-  if major != 1 || (minor != 2 && minor != 4) {
-    raise Unsupported("only LAS 1.2 and 1.4 are supported")
+  if major != 1 || minor < 1 || minor > 4 {
+    raise Unsupported("supported versions are LAS 1.1 through 1.4")
   }
+  let raw_text = slice_bytes(data, r.pos, 64)
   let system = r.text(32)
   let software = r.text(32)
   let day = r.u16()
@@ -45,8 +52,8 @@ pub fn read_header(
   require(day <= 366, "invalid creation day")
   let header_size = r.u16()
   require(
-    header_size == (if minor == 2 { 227 } else { 375 }),
-    "extended public headers are unsupported",
+    header_size >= base_header_size(minor),
+    "public header shorter than the version minimum",
   )
   let point_offset = r.u32(limits.max_bytes)
   let vlr_count = r.u32(limits.max_vlrs)
@@ -55,7 +62,7 @@ pub fn read_header(
     raise Unsupported("compressed or reserved point format bits")
   }
   let width = record_size(format)
-  require(minor == 4 || format <= 3, "point format requires LAS 1.4")
+  validate_version_format(minor, format)
   let record_length = r.u16()
   require(record_length >= width, "point record is shorter than the format")
   let legacy_count = r.u32(limits.max_points)
@@ -80,10 +87,12 @@ pub fn read_header(
   )
   let mut point_count = legacy_count
   let mut by_return = legacy_returns
+  let waveform_offset = if minor >= 3 { r.u64(limits.max_bytes) } else { 0 }
+  let mut evlr_offset = 0
+  let mut evlr_count = 0
   if minor == 4 {
-    require(r.u64(0) == 0, "waveform packet data unsupported")
-    require(r.u64(0) == 0, "EVLR data unsupported")
-    require(r.u32(0) == 0, "EVLR records unsupported")
+    evlr_offset = r.u64(limits.max_bytes)
+    evlr_count = r.u32(limits.max_vlrs)
     point_count = r.u64(limits.max_points)
     by_return = Array::makei(15, _ => r.u64(limits.max_points))
     if format >= 6 {
@@ -104,7 +113,8 @@ pub fn read_header(
       }
     }
   }
-  let allowed = if minor == 2 { 1 } else { 25 }
+  let extra = r.take(header_size - base_header_size(minor))
+  let allowed = encoding_mask(minor)
   require(
     (global_encoding & allowed) == global_encoding,
     "unsupported global encoding bits",
@@ -131,8 +141,64 @@ pub fn read_header(
     by_return,
     transform,
     bounds: (xmin, ymin, zmin, xmax, ymax, zmax),
+    extra,
+    raw_text,
+    waveform_offset,
+    evlr_offset,
+    evlr_count,
+    legacy_counts: minor < 4 ||
+    legacy_count != 0 ||
+    !legacy_returns.all(x => x == 0),
   }
 }
 
 ///|
 pub extend Header with @debug.Debug::{to_repr}
+
+///|
+fn base_header_size(minor : Int32) -> Int32 {
+  if minor == 4 {
+    375
+  } else if minor == 3 {
+    235
+  } else {
+    227
+  }
+}
+
+///|
+fn encoding_mask(minor : Int32) -> Int32 {
+  if minor == 4 {
+    31
+  } else if minor == 3 {
+    15
+  } else if minor == 2 {
+    1
+  } else {
+    0
+  }
+}
+
+///|
+fn validate_version_format(
+  minor : Int32,
+  format : Int32,
+) -> Unit raise LasError {
+  require(
+    minor >= 1 && minor <= 4,
+    "supported versions are LAS 1.1 through 1.4",
+  )
+  let max_format = if minor == 1 {
+    1
+  } else if minor == 2 {
+    3
+  } else if minor == 3 {
+    5
+  } else {
+    10
+  }
+  require(
+    format >= 0 && format <= max_format,
+    "point format is not defined in this LAS version",
+  )
+}

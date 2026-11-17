@@ -48,7 +48,7 @@ fn put_text(
   require(chars.length() <= width, "metadata text exceeds field width")
   for c in chars {
     let n = c.to_int()
-    require(n >= 32 && n <= 126, "metadata text must be printable ASCII")
+    require(n > 0 && n <= 255, "metadata text must be byte-valued and non-NUL")
     put8(out, n)
   }
   for _ in chars.length()..<width {
@@ -59,4 +59,30 @@ fn put_text(
 ///|
 fn bytes_of(out : Array[Byte]) -> Bytes {
   Bytes::from_array(out[:])
+}
+
+///|
+fn put_uint64(out : Array[Byte], value : UInt64) -> Unit {
+  for i in 0..<8 {
+    put8(out, (value >> (8 * i)).to_int())
+  }
+}
+
+///|
+fn put_float32(out : Array[Byte], value : Float) -> Unit {
+  put32(out, value.reinterpret_as_int())
+}
+
+///|
+fn put_preserved_text(
+  out : Array[Byte],
+  text : String,
+  width : Int32,
+  raw : Bytes,
+) -> Unit raise LasError {
+  if raw.length() == width && fixed_text(raw) == text {
+    append(out, raw)
+  } else {
+    put_text(out, text, width)
+  }
 }

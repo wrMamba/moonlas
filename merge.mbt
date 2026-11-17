@@ -25,7 +25,14 @@ pub fn Document::merge(
     "merge project/file identity conflict",
   )
   require(
-    self.vlrs == other.vlrs && self.gap == other.gap,
+    self.vlrs == other.vlrs &&
+    self.gap == other.gap &&
+    self.header.extra == other.header.extra &&
+    self.tail == other.tail &&
+    relative_tail_offset(self.header.waveform_offset, self.header) ==
+    relative_tail_offset(other.header.waveform_offset, other.header) &&
+    relative_tail_offset(self.header.evlr_offset, self.header) ==
+    relative_tail_offset(other.header.evlr_offset, other.header),
     "merge opaque metadata conflict",
   )
   if other.points.length() > limits.max_points - self.points.length() {
@@ -37,4 +44,13 @@ pub fn Document::merge(
     points.push(p)
   }
   self.with_points(points, limits~)
+}
+
+///|
+fn relative_tail_offset(offset : Int32, h : Header) -> Int32 {
+  if offset == 0 {
+    -1
+  } else {
+    offset - point_end(h)
+  }
 }
