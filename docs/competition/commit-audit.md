@@ -27,3 +27,10 @@
 | `2da803418b0d` | ci: reproduce strict four-backend workflows and independent oracle regeneration | `.github/workflows/ci.yml`, `pkg.generated.mbti`, `tools/audit_source.py` |
 
 验证方式：查看每个提交的实际源码/对应测试；最终同一发布候选运行严格检查、构建、45个测试与示例。独立 laspy 参考352点，1792属性组合单列；实际CI链接和精确发布SHA记录在仓库外交付审计，避免文件自引用。Windows本地native只通过check，test/build缺C工具链；Linux CI承担真实native验收。
+
+
+## 0.2.0 修订增量
+
+`b1ecba2`实现全点格式、EVLR、波形、Extra Bytes、元数据重定位及独立验证，计为一个实质工程提交。本轮文档/CI说明提交不另增加保守计数，因此累计有效提交为22。0.1.0的上述历史数据不覆盖当前版本。
+
+0.2.0本地复核：84项测试；wasm-gc/wasm/js的check、test、build和四个示例通过，native本地check通过。35份832点独立参考，2816个属性组合；生成器再生后四个生成文件hash一致。2648行生产源码，非空非注释2298行。发布以新的实际CI与精确包消费者结果为准，证据留在仓库外。

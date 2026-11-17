@@ -1,122 +1,93 @@
 # MoonLAS
 
-纯 MoonBit 的**有界 LAS 点云二进制处理库**，模块 `wrMamba/moonlas@0.1.0`。
-读取 LAS 1.2/1.4 的七种点记录格式，保留点属性和不透明元数据，完成质量检查、筛选、空间裁剪、量化与高程栅格聚合。不依赖 Python、C 点云库或操作系统文件 API。
+纯 MoonBit 的 LAS 点云读写与处理库，MIT 许可。面向采集质量检查、GIS 地面点处理和点云接入服务，将点属性处理与标准元数据保留放在同一个工作流中。
 
-## 解决什么问题
+**0.2.0** 以未压缩 LAS 1.4 的全部点格式及文件结构为实现目标，并兼容 LAS 1.1–1.3。覆盖公共头、VLR、EVLR、0–10 点格式、内部/外部波形引用、Extra Bytes 与投影记录；具体版本矩阵和资源边界见 [LAS 兼容性](docs/las-compatibility.md)。不是 LAZ 解压器，也不提供 CRS 重投影。
 
-采集质量检查系统需要核对分类、回波、强度及头部边界；GIS/遥感流水线需要筛出地面点并生成小区域高程栅格；机器人和可视化接入层需要按批解码、统一坐标量化且保留颜色、GPS 和额外属性。MoonLAS 让这些系统共用格式与边界检查，而不是分别实现 LASF 字节偏移和位字段。
-
-本项目不是井测文本 LAS 解析器，不是完整 GIS 引擎，也不是 LAZ 解压器。
-
-## 环境与安装
-
-固定验收工具链：`moonc v0.10.18+6c83a7f62`，`moon 0.1.20261028`。支持 `wasm-gc`、`wasm`、`js` 和 `native` 后端；JS 需要 Node.js，native 需要相应 C 编译器。CI 在 Ubuntu 24.04 对四后端执行严格 check/test/build 与三个示例，另有独立 laspy 参考向量再生成作业。
-
-在新的 MoonBit 项目中：
+## 安装与环境
 
 ```sh
-moon add wrMamba/moonlas@0.1.0
+moon add wrMamba/moonlas@0.2.0
 ```
 
-在使用包的 `moon.pkg` 中加入：
+在 `moon.pkg` 中导入：
 
 ```moonbit
-import { "wrMamba/moonlas" @las }
+import {
+  "wrMamba/moonlas" @las,
+}
 ```
 
-### 快速开始
+仓库固定 MoonBit `0.10.18+6c83a7f62`。CI 对 `wasm-gc`、`wasm`、`js`、Linux `native` 执行检查、测试、构建和四个示例。库只依赖 MoonBit core；调用者负责把文件读入 `Bytes` 和保存输出。
 
-下面是完整可运行的 `main.mbt`；包需设置 `pkgtype(kind: "executable")`。
+## 快速开始
 
 ```moonbit
 fn main {
   try {
-    let p = @las.Point::new(10, 20, 30)
-    let points = [p, { ..p, x: 40, classification: 2 }]
-    let doc = @las.create(points, 0, @las.Transform::new(0.01), minor=2)
-    let raw = @las.encode(doc)
-    let parsed = @las.decode(raw)
+    let doc = @las.create([
+      { ..@las.Point::new(100, 200, 30), classification: 2 },
+      { ..@las.Point::new(120, 220, 40), classification: 1 },
+    ], 0, @las.Transform::new(0.01))
+    let input_bytes = @las.encode(doc)
+    let parsed = @las.decode(input_bytes)
     let ground = parsed.select({ ..@las.Selection::all(), classifications: [2] })
-    println(ground.points.length()) // 1
-    println(@las.encode(ground).length()) // 247
-  } catch { _ => abort("LAS processing failed") }
+    let output_bytes = @las.encode(ground)
+    assert_eq(@las.decode(output_bytes).points.length(), 1)
+    println("accepted=1; format=0")
+  } catch {
+    _ => abort("LAS workflow failed")
+  }
 }
 ```
 
-库处理 `Bytes` 而不打开文件；应用自行从文件、网络或对象存储获取字节。错误类型 `LasError` 区分 `Truncated(offset)`、`Limit(message)`、`Invalid(message)` 与 `Unsupported(message)`，调用者可匹配错误而不是终止进程。
+坐标原始整数与 scale/offset 分开保存。`Transform::position` 计算物理坐标；`requantize` 仅修改量化编码并报告各轴最大误差，不转换坐标系。
 
-## 已交付能力
+## 点属性、质量检查与地形
 
-| 能力 | 具体契约 |
-| --- | --- |
-| 读写 | LAS 1.2 格式 0/1/2/3；LAS 1.4 格式 0/1/2/3/6/7/8 |
-| 点属性 | raw Int32 XYZ、强度、回波、分类、标志、扫描角、来源 ID、用户数据，以及对应格式的 GPS/RGB/NIR |
-| 元数据 | 16 字节项目 UUID、文件头标识、VLR 不透明 payload、VLR 到点区的 gap、每点额外字节 |
-| 质量审计 | 分类/回波/标志直方图，强度范围与均值、实际边界，发现头部边界/回波统计陈旧 |
-| 筛选 | 分类、来源 ID、强度、首/末/单回波、withheld、GPS 闭区间；所有条件取交集，输出顺序不变 |
-| 空间操作 | 缩放坐标下的闭 AABB / 球形裁剪，正比例尺和偏移校验 |
-| 栅格 | 有界稠密 XY 网格；非空 cell 的点数、class 2 数量、高程最小/最大/均值及平均强度 |
-| 量化/拼接 | 半远离零舍入，Int32 溢出检查、调用者显式误差容限；元数据冲突拒绝而非猜测合并 |
-| 按需访问 | `open_records`、`seek`、`next`、`batch`；输入仍为完整有界 Bytes，不是磁盘流式 reader |
+- 所有点格式 0–10 的整数坐标、强度、回波、分类及标志、扫描角、用户数据、来源、GPS、RGB、NIR、波形字段按对应格式读取和写出。
+- `Document::audit` 计算分类、回波、标志、边界和强度统计，并报告头部统计不一致。
+- `select`、`crop` 与 `within_radius` 生成新文档；`elevation_grid` 输出有预算的稠密网格，地形示例将格网统计写成 CSV。
+- `open_records` 提供基于输入 `Bytes` 的游标，支持 `batch`、`seek`，避免一次建立全部 Point 对象；它不是磁盘流式读取器。
+- `merge` 要求版本、点格式、额外字节宽度、项目/文件标识、global encoding、VLR、扩展头、间隙、尾部及元数据相对位置兼容，右侧按左侧坐标编码重新量化。应用负责确认 CRS 相同。
 
-完整公共接口由 [`pkg.generated.mbti`](pkg.generated.mbti) 给出。数据结构包含可变数组；操作前会重新检查结构，不提供并发/不可变快照保证。
+## 元数据与波形
 
-## API 工作流
-
-### 采集检查与修复
+`decode` 保留未知 VLR/EVLR、保留字、固定文本原始字节、扩展头字节、点前间隙、每点额外字节及点后尾部。`with_points` / 筛选 / 编码会重算点数和边界，并随点区长度变化重定位 EVLR 与内部波形绝对偏移。普通处理不删减波形记录，允许保留未引用的数据包。
 
 ```moonbit
-let report = doc.audit()
-let repaired = doc.with_points(doc.points)
-let output = @las.encode(repaired)
+let records = parsed.evlrs()
+let projection = parsed.projection_records()
+let dimensions = @las.extra_dimensions(parsed.vlrs, parsed.header.record_length - 20)
 ```
 
-`decode` 接受可审计的陈旧边界/回波统计；其他非法结构仍报错。`with_points` 重建点数、回波统计、边界、record width、VLR 数量与 offset。`encode` 先要求结构自洽，再规范化派生字段；它不是逐字节原文件归档器。LAS 1.4 输出的 legacy 计数字段为零，读取旧格式时也接受与扩展计数一致的非零 legacy 字段。固定文本字段只保留首个 NUL 之前的可打印 ASCII，后部填充重新置零。
-
-### GIS：地面筛选、裁剪和栅格
+最后一行的 `20` 仅适用于点格式 0 的基础宽度。其他格式基础宽度见兼容性表。Extra Bytes 解析全部 30 种数值类型和未类型化字节区，保留 no-data/min/max/scale/offset；`extra_values` 返回精确整数或浮点值，scale/offset 由应用显式使用，64 位 ID 不转成 Double。GeoTIFF/WKT 记录按原字节获取与保留，不求解投影。LAS 1.4 格式 6–10 的生产数据应设置 WKT global encoding 位并提供适当的 WKT 记录。
 
 ```moonbit
-let ground = doc.select({ ..@las.Selection::all(), classifications: [2], include_withheld: false })
-let area = ground.crop({ min: { x: 0.0, y: 0.0, z: -100.0 }, max: { x: 100.0, y: 100.0, z: 500.0 } })
-let grid = area.elevation_grid(2.0)
-let cell = grid.at(0, 0) // Cell?；空 cell/越界为 None
+let amplitudes = waveform_doc.waveform_samples(waveform_doc.points[0])
+let external_samples = waveform_doc.waveform_samples(
+  waveform_doc.points[0], external=Some(wdp_bytes),
+)
 ```
 
-栅格原点为输入点的实际 XY 最小值，按 `floor((coord-origin)/cell_size)` 分箱。边界最大值恰好位于分界线时落入下一个格；行优先存储。空点集返回 0×0 网格。class 2 仅作数值分类计数，不推断语义正确性或 CRS。
+波形格式为 4/5/9/10，内部记录及调用者提供的外部 `.wdp` 均可访问。包偏移以 60 字节波形记录头起点为基准；支持无压缩 8/16 位样本并应用 gain/offset。其他编码原样保留，样本解释返回 `Unsupported`。`with_evlrs` 显式替换 EVLR 链并重定位波形，拒绝删除仍被点引用的内部波形记录。
 
-### 接入：批量读取、容限重编码与拼接
-
-```moonbit
-let cursor = @las.open_records(input_bytes)
-let batch = cursor.batch(256)
-cursor.seek(0)
-let result = doc.requantize(@las.Transform::new(0.02), 0.011)
-let output_bytes = @las.encode(result.document)
-let joined = doc.merge(other_doc, 0.011)
-```
-
-`requantize` 返回实际各轴最大误差，超容限拒绝。不是坐标参考系转换。`merge` 要求版本、点格式、额外字节宽度、global encoding、项目/文件标识、VLR 和 gap 相同；右侧量化到左侧坐标编码，保留左侧头部来源/日期/软件信息。仅比例尺不同并不证明 CRS 相同，应用必须保证坐标系一致。
-
-## 三个可运行场景
-
-以下输入均为仓库内原创合成数据，不依赖网络或私人点云。
+## 四个可运行工作流
 
 ```sh
-moon run examples/quality --deny-warn  # 120 点质量统计，剔除 withheld/低强度，101 点输出
-moon run examples/terrain --deny-warn  # 地面筛选与裁剪，3×3 网格，CSV 统计输出
-moon run examples/ingest --deny-warn   # 格式 8，64 点分批读取，量化、球裁剪，27 点输出
+moon run examples/quality --deny-warn
+moon run examples/terrain --deny-warn
+moon run examples/ingest --deny-warn
+moon run examples/waveform --deny-warn
 ```
 
-## 资源、安全与已知限制
+输入均为原创合成数据。质量示例从 120 点筛至 101 点；地形示例生成 3×3 高程网格；接入示例分批读取 64 点并裁剪至 27 点；波形示例将格式 10 的两点筛至一点，验证三个 EVLR、WKT、四个波形样本及偏移全部有效。
 
-- 默认输入/序列化预算 64 MiB、点数 1,000,000、VLR 4096、网格 1,000,000 格；可通过 `Limits` 显式调整。安全上限分别为 1 GiB、10,000,000 点、65,535 VLR、10,000,000 格。预算不等于进程峰值内存保证；数组、元数据和输出会复制。
-- 64 位头部计数仅接受高 32 位为零且低位在预算内，不支持任意 64 位规模文件。乘法、偏移和分配前检查，失败返回错误。
-- LAS 1.0/1.1/1.3、格式 4/5/9/10、LAZ/压缩位、waveform、EVLR、扩展公共头、尾随数据和未知 global encoding 位不支持。
-- 严格子集：回波编号必须从 1 开始且不超过总回波，旧格式最多 5；0 回波记录拒绝。GPS/坐标/比例尺/偏移必须有限，比例尺必须为正；旧扫描角范围 [-90,90]，现代 raw 扫描角 [-30000,30000]（单位 0.006°）。
-- 固定字段仅支持可打印 ASCII；不解释 Extra Bytes schema、GeoTIFF/WKT 或 CRS、不做重投影。VLR payload 与点额外字节按不透明字节保留。
-- 空间筛选为线性扫描，栅格为有预算的稠密矩阵；不是通用八叉树、最近邻库、渲染器、DTM 插值器或生产级超大文件服务。
-- 边界/直方图审计为精确值比较；浮点量化需要结合应用误差容限。解析器会检查结构，但未做安全审计认证，也不保证任意合法 LAS 均可处理。
+## 资源与能力边界
+
+默认预算：64 MiB 输入/输出、1,000,000 点、4096 个 VLR/EVLR、1,000,000 网格单元。`Limits` 可显式调整，安全上限为 1 GiB、10,000,000 点、65,535 条记录、10,000,000 网格单元。预算不代表峰值内存保证，元数据与数组可能复制。磁盘上的 64 位长度/计数在分配前验证预算，波形引用与 Extra Bytes 的 64 位数值保全原始位宽。
+
+支持范围为 LAS 1.1–1.4 的未压缩容器；不覆盖 LAS 1.0、1.5、LAZ、压缩波形解码、大文件磁盘流式 IO、重投影、DTM 插值或空间索引。非有限坐标/GPS、零比例尺、非法回波关系、越界扫描角、损坏偏移与超预算输入返回错误。有限负比例尺可用。解析并不保证畸形文件可修复；保留元数据也不等于通用文件逐字节拷贝，编码会规范化派生统计。
 
 ## 验证与复现
 
@@ -129,22 +100,23 @@ moon build --deny-warn --target wasm-gc
 python tools/audit_source.py
 ```
 
-将目标替换为 `wasm`、`js`、`native` 可复核其他后端。当前 45 个测试：包括 11 份由 **laspy 2.6.1 / numpy 2.2.6** 生成的文件、352 条独立记录逐字段读取与更改后完整写入字节对照、1792 条自生成属性组合、截断前缀、预算、冲突和三个下游流程。
+可把目标改为 `wasm`、`js`、`native`。当前 **84 项测试**，独立参考数据包含 laspy 2.6.1 / numpy 2.2.6 生成的 23 个版本/格式组合、736 点，以及 12 个内外波形文档、96 点，共 **35 个文档、832 点**。测试比较读取字段、完整写出字节与修改后写出字节，另覆盖 12 个波形筛选输出；自生成属性矩阵为 2816 个组合，单独计数。
 
-独立向量再生成请使用隔离 Python 3.12 环境：
+在独立 Python 3.12 环境安装固定依赖后再生：
 
 ```sh
-python -m venv .oracle-env
-# 激活该环境后：
 python -m pip install laspy==2.6.1 numpy==2.2.6
 python tools/generate_oracles.py
+python tools/generate_waveform_oracles.py
 moon fmt
-# 生成物应与提交版本一致：
-git diff --exit-code -- reference_wbtest.mbt tools/oracle-manifest.json
+git diff --exit-code -- reference_wbtest.mbt waveform_reference_wbtest.mbt tools/oracle-manifest.json tools/waveform-oracle-manifest.json
+moon test --deny-warn
 ```
 
-实质生产源码的物理行/非空非注释行由 inventory 脚本输出；测试、生成的参考向量、示例和接口均不计入。没有发布性能优越性或实测用户规模声明。
+## 0.1.0 迁移
 
-## 来源、许可与 AI
+新增的公开字段包括 `Point.waveform`、`Document.tail`、头部扩展及 EVLR/波形偏移、记录保留字与原始文本。优先使用 `Point::new`、`Vlr::new`、`Evlr::new` 和 record update 语法，避免手写所有结构字段。旧版仅支持格式 0/1/2/3/6/7/8 的范围已扩展；新版本会保留以前拒绝的 EVLR、波形及尾部。
 
-原创 MoonBit 实现，MIT；仅使用 MoonBit core。行为参考 [laspy](https://github.com/laspy/laspy)（BSD-3-Clause），不复制其实现、测试或数据。详见 [NOTICE](NOTICE)、[AI-USE.md](AI-USE.md)、[架构与安全](docs/architecture.md)、[语义查重](docs/competition/duplicate-check.md)。AI 参与实现、测试、调试与文档，测试结果不等于官方赛事验收；本流程不自动报名。
+## 来源与许可
+
+原创 MoonBit 实现，MIT；参考 [ASPRS LAS 1.4 标准](https://github.com/ASPRSorg/LAS/tree/main-1.4) 的字段定义。行为对照 [laspy](https://github.com/laspy/laspy)（BSD-3-Clause）；不复制其实现、测试或数据。详见 [NOTICE](NOTICE)、[AI 使用说明](AI-USE.md)、[架构](docs/architecture.md)、[兼容性](docs/las-compatibility.md)、[选题研究](docs/competition/duplicate-check.md)。

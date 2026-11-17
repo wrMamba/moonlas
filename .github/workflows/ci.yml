@@ -37,6 +37,7 @@ jobs:
           moon run examples/quality --deny-warn --target ${{ matrix.target }}
           moon run examples/terrain --deny-warn --target ${{ matrix.target }}
           moon run examples/ingest --deny-warn --target ${{ matrix.target }}
+          moon run examples/waveform --deny-warn --target ${{ matrix.target }}
       - name: Production source floor
         run: python3 tools/audit_source.py
   independent-oracle:
@@ -53,10 +54,11 @@ jobs:
           echo "46495f8cdc0050f79b6cb195d66478d101cb3601d68506568fbe377fcdf2a9fe  /tmp/install-moonbit.sh" | sha256sum -c -
           bash /tmp/install-moonbit.sh '0.10.18+6c83a7f62'
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
-      - name: Regenerate 352 independent records and changed-write vectors
+      - name: Regenerate 832 independent records and changed-write vectors
         run: |
           python -m pip install --disable-pip-version-check laspy==2.6.1 numpy==2.2.6
           python tools/generate_oracles.py
+          python tools/generate_waveform_oracles.py
           moon fmt
-          git diff --exit-code -- reference_wbtest.mbt tools/oracle-manifest.json
+          git diff --exit-code -- reference_wbtest.mbt waveform_reference_wbtest.mbt tools/oracle-manifest.json tools/waveform-oracle-manifest.json
           moon test --deny-warn
