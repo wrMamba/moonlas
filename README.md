@@ -2,12 +2,12 @@
 
 纯 MoonBit 的 LAS 点云读写与处理库，MIT 许可。面向采集质量检查、GIS 地面点处理和点云接入服务，将点属性处理与标准元数据保留放在同一个工作流中。
 
-**0.2.0** 以未压缩 LAS 1.4 的全部点格式及文件结构为实现目标，并兼容 LAS 1.1–1.3。覆盖公共头、VLR、EVLR、0–10 点格式、内部/外部波形引用、Extra Bytes 与投影记录；具体版本矩阵和资源边界见 [LAS 兼容性](docs/las-compatibility.md)。不是 LAZ 解压器，也不提供 CRS 重投影。
+**0.2.1** 以未压缩 LAS 1.4 的全部点格式及文件结构为实现目标，并兼容 LAS 1.1–1.3。覆盖公共头、VLR、EVLR、0–10 点格式、内部/外部波形引用、Extra Bytes 与投影记录；具体版本矩阵和资源边界见 [LAS 兼容性](docs/las-compatibility.md)。不是 LAZ 解压器，也不提供 CRS 重投影。
 
 ## 安装与环境
 
 ```sh
-moon add wrMamba/moonlas@0.2.0
+moon add wrMamba/moonlas@0.2.1
 ```
 
 在 `moon.pkg` 中导入：
@@ -18,7 +18,7 @@ import {
 }
 ```
 
-仓库固定 MoonBit `0.10.18+6c83a7f62`。CI 对 `wasm-gc`、`wasm`、`js`、Linux `native` 执行检查、测试、构建和四个示例。库只依赖 MoonBit core；调用者负责把文件读入 `Bytes` 和保存输出。
+仓库固定 MoonBit `0.10.22+124d61d05`。CI 对 `wasm-gc`、`wasm`、`js`、Linux `native` 执行检查、测试、构建和四个示例。库只依赖 MoonBit core；调用者负责把文件读入 `Bytes` 和保存输出。
 
 ## 快速开始
 

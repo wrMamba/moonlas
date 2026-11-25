@@ -1,12 +1,13 @@
 ///|
 /// In-memory LAS document. Public operations validate mutable array contents before use.
+#derive(Debug)
 pub(all) struct Document {
   header : Header
   vlrs : Array[Vlr]
   gap : Bytes
   points : Array[Point]
   tail : Bytes
-} derive(Debug)
+}
 
 ///|
 pub fn decode(

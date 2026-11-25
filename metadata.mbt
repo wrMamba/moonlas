@@ -1,5 +1,6 @@
 ///|
 /// VLR payloads are opaque. GeoTIFF/WKT records are retained without reprojection.
+#derive(Debug, Eq)
 pub(all) struct Vlr {
   user_id : String
   record_id : Int32
@@ -7,7 +8,7 @@ pub(all) struct Vlr {
   payload : Bytes
   reserved : Int32
   raw_text : Bytes
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn Vlr::validate(self : Vlr) -> Unit raise LasError {

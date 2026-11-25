@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 — 2026-11-25
+
+- Update MoonBit to the official stable toolchain 0.10.22+124d61d05 and adopt its current derive syntax so strict CI remains warning-free.
+- Regenerate the public interface with the pinned compiler.
+
 ## 0.2.0 — 2026-11-17
 
 - Expand uncompressed LAS support to versions 1.1–1.4 and all point formats 0–10.

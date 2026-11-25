@@ -1,8 +1,9 @@
 ///|
+#derive(Debug)
 pub(all) struct Requantized {
   document : Document
   max_error : Position
-} derive(Debug)
+}
 
 ///|
 /// Coordinate rescaling only. No CRS conversion; reject errors over caller tolerance.

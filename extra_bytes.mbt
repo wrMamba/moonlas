@@ -1,5 +1,6 @@
 ///|
 /// Extra Bytes descriptors retain typed no-data/min/max unions without conversion.
+#derive(Debug)
 pub(all) struct ExtraDimension {
   name : String
   description : String
@@ -12,14 +13,15 @@ pub(all) struct ExtraDimension {
   maximum : Bytes
   scale : Array[Double]
   offset : Array[Double]
-} derive(Debug)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum ExtraValue {
   Unsigned(UInt64)
   Signed(Int64)
   Real(Double)
-} derive(Debug, Eq)
+}
 
 ///|
 fn extra_scalar_width(data_type : Int32) -> Int32 raise LasError {

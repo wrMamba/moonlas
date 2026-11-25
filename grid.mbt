@@ -1,4 +1,5 @@
 ///|
+#derive(Debug, Eq)
 pub(all) struct Cell {
   count : Int32
   ground_count : Int32
@@ -6,10 +7,11 @@ pub(all) struct Cell {
   max_z : Double
   mean_z : Double
   mean_intensity : Double
-} derive(Debug, Eq)
+}
 
 ///|
 /// Dense row-major XY grid. Empty cells are None, never fabricated elevations.
+#derive(Debug)
 pub(all) struct Grid {
   origin_x : Double
   origin_y : Double
@@ -17,7 +19,7 @@ pub(all) struct Grid {
   columns : Int32
   rows : Int32
   cells : Array[Cell?]
-} derive(Debug)
+}
 
 ///|
 pub fn Grid::at(

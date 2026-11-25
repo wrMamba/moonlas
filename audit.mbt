@@ -1,5 +1,6 @@
 ///|
 /// Computed from records, never copied from the public header.
+#derive(Debug)
 pub(all) struct Audit {
   count : Int32
   classifications : Array[Int32]
@@ -10,7 +11,7 @@ pub(all) struct Audit {
   intensity_max : Int32
   intensity_mean : Double
   issues : Array[String]
-} derive(Debug)
+}
 
 ///|
 /// Structural invalidity raises; stale derived header fields become issues.

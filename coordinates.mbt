@@ -1,9 +1,10 @@
 ///|
+#derive(Debug, Eq)
 pub(all) struct Position {
   x : Double
   y : Double
   z : Double
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn Position::validate(self : Position) -> Unit raise LasError {
@@ -66,10 +67,11 @@ pub fn Transform::quantize(
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct Bounds {
   min : Position
   max : Position
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn Bounds::validate(self : Bounds) -> Unit raise LasError {

@@ -1,5 +1,6 @@
 ///|
 /// Extended records carry 64-bit lengths on disk; allocations remain bounded by Limits.
+#derive(Debug, Eq)
 pub(all) struct Evlr {
   user_id : String
   record_id : Int32
@@ -7,7 +8,7 @@ pub(all) struct Evlr {
   payload : Bytes
   reserved : Int32
   raw_text : Bytes
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn Evlr::new(

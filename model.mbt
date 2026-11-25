@@ -1,11 +1,12 @@
 ///|
 /// Recoverable input errors carry a byte offset where available.
+#derive(Debug)
 pub suberror LasError {
   Truncated(Int32)
   Limit(String)
   Invalid(String)
   Unsupported(String)
-} derive(Debug)
+}
 
 ///|
 fn require(ok : Bool, message : String) -> Unit raise LasError {
@@ -21,12 +22,13 @@ fn finite(x : Double) -> Bool {
 
 ///|
 /// Budgets apply before allocating record arrays or metadata payloads.
+#derive(Debug, Eq)
 pub(all) struct Limits {
   max_bytes : Int32
   max_points : Int32
   max_vlrs : Int32
   max_cells : Int32
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn Limits::default() -> Limits {
@@ -57,6 +59,7 @@ pub fn Limits::validate(self : Limits) -> Unit raise LasError {
 
 ///|
 /// XYZ scale factors and offsets. They never imply a coordinate reference system.
+#derive(Debug, Eq)
 pub(all) struct Transform {
   sx : Double
   sy : Double
@@ -64,7 +67,7 @@ pub(all) struct Transform {
   ox : Double
   oy : Double
   oz : Double
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn Transform::new(scale : Double) -> Transform raise LasError {
@@ -85,6 +88,7 @@ pub fn Transform::validate(self : Transform) -> Unit raise LasError {
 
 ///|
 /// Raw integer attributes retain the exact LAS record semantics.
+#derive(Debug, Eq)
 pub(all) struct Point {
   x : Int32
   y : Int32
@@ -105,7 +109,7 @@ pub(all) struct Point {
   nir : Int32?
   extra : Bytes
   waveform : Waveform?
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn Point::new(x : Int32, y : Int32, z : Int32) -> Point {

@@ -1,13 +1,15 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum ReturnMode {
   Any
   First
   Last
   Single
-} derive(Debug, Eq)
+}
 
 ///|
 /// Empty membership lists impose no restriction. All criteria are intersected.
+#derive(Debug)
 pub(all) struct Selection {
   classifications : Array[Int32]
   source_ids : Array[Int32]
@@ -17,7 +19,7 @@ pub(all) struct Selection {
   include_withheld : Bool
   gps_min : Double?
   gps_max : Double?
-} derive(Debug)
+}
 
 ///|
 pub fn Selection::all() -> Selection {

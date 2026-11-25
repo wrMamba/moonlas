@@ -1,5 +1,6 @@
 ///|
 /// Header fields are retained; counts and extents can be audited against records.
+#derive(Debug)
 pub(all) struct Header {
   minor : Int32
   file_source_id : Int32
@@ -23,7 +24,7 @@ pub(all) struct Header {
   evlr_offset : Int32
   evlr_count : Int32
   legacy_counts : Bool
-} derive(Debug)
+}
 
 ///|
 pub fn read_header(

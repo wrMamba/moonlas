@@ -18,12 +18,12 @@ jobs:
         run: |
           curl --fail --location --silent --show-error --retry 2 https://cli.moonbitlang.com/install/unix.sh -o /tmp/install-moonbit.sh
           echo "46495f8cdc0050f79b6cb195d66478d101cb3601d68506568fbe377fcdf2a9fe  /tmp/install-moonbit.sh" | sha256sum -c -
-          bash /tmp/install-moonbit.sh '0.10.18+6c83a7f62'
+          bash /tmp/install-moonbit.sh '0.10.22+124d61d05'
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - name: Toolchain and interface stability
         run: |
           moon version --all
-          moon version --all | grep -F 'moonc v0.10.18+6c83a7f62'
+          moon version --all | grep -F 'moonc v0.10.22+124d61d05'
           moon info
           moon fmt --check
           git diff --exit-code -- '*.mbti'
@@ -52,7 +52,7 @@ jobs:
         run: |
           curl --fail --location --silent --show-error --retry 2 https://cli.moonbitlang.com/install/unix.sh -o /tmp/install-moonbit.sh
           echo "46495f8cdc0050f79b6cb195d66478d101cb3601d68506568fbe377fcdf2a9fe  /tmp/install-moonbit.sh" | sha256sum -c -
-          bash /tmp/install-moonbit.sh '0.10.18+6c83a7f62'
+          bash /tmp/install-moonbit.sh '0.10.22+124d61d05'
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - name: Regenerate 832 independent records and changed-write vectors
         run: |

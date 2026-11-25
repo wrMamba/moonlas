@@ -1,5 +1,6 @@
 ///|
 /// Waveform packet references retain all 64 offset bits, including external WDP offsets.
+#derive(Debug, Eq)
 pub(all) struct Waveform {
   descriptor_index : Int32
   byte_offset : UInt64
@@ -8,7 +9,7 @@ pub(all) struct Waveform {
   dx : Float
   dy : Float
   dz : Float
-} derive(Debug, Eq)
+}
 
 ///|
 fn has_waveform(format : Int32) -> Bool {
@@ -49,6 +50,7 @@ fn write_waveform(out : Array[Byte], w : Waveform) -> Unit raise LasError {
 ///|
 /// Descriptor VLR fields; compression codes and sample precision are retained even
 /// when the optional uncompressed sample accessor cannot interpret them.
+#derive(Debug, Eq)
 pub(all) struct WaveformDescriptor {
   bits_per_sample : Int32
   compression : Int32
@@ -56,7 +58,7 @@ pub(all) struct WaveformDescriptor {
   spacing_ps : UInt32
   gain : Double
   offset : Double
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn waveform_descriptor(vlr : Vlr) -> WaveformDescriptor raise LasError {

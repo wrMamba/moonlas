@@ -1,10 +1,11 @@
 ///|
 /// Opaque CRS records keep the declared WKT/GeoTIFF payload and original location.
+#derive(Debug, Eq)
 pub(all) struct ProjectionRecord {
   record_id : Int32
   extended : Bool
   payload : Bytes
-} derive(Debug, Eq)
+}
 
 ///|
 /// Collect both VLR and EVLR projection records, including vendor extensions.
