@@ -68,3 +68,16 @@ LAS IO、保留属性、量化、元数据冲突和资源预算构成独立的�
 0.2.0扩展到LAS1.1–1.4全部点格式、EVLR、内外波形与Extra Bytes。复查MoonCakes `LAS point cloud` 的100条上限查询仅返回本项目0.1.0；GitHub `wavepacket language:MoonBit` 返回0、incomplete_results=false。广义waveform查询有152项，仅查看第一页100项，结果涉及音频合成、波形UI和媒体绑定，不能将该查询称作完整审查。结论结合原始LASF与点云功能矩阵，限于已检查范围，未确认新的成熟直接替代；不主张全生态唯一。
 
 扩展能力仍属于LAS文件语义和处理时的数据保留，与音频波形库、通用几何索引或栅格库不同。公开标准来源现增加ASPRS LAS仓库main-1.4分支；原始研究的访问限制保留为历史记录，不等同于本轮仍无法读取标准。
+
+## 2026-11-27 工具链修订时的近邻复查
+
+本次是原项目的修复验收，不重新选题。使用当日 Moon CLI 成功执行 `LASF`、`LAS point cloud`、`laspy`、`LiDAR`、`pointcloud`、`Extra Bytes`、`elevation_grid`、`LAS` 八组查询（每组上限 100，当前 CLI JSON 参数为 `--json`）。`LASF`、`laspy` 为 0，`LAS point cloud` 仅返回本项目 0.2.1；`pointcloud` 返回 17 项，其中新增相关近邻如下。`LAS` 达到 100 项上限，不作为穷尽证明。
+
+|已读取的公开证据|实际功能与 MoonLAS 的边界|
+|---|---|
+|[`t-ujiie-g/draco@0.1.0`](https://mooncakes.io/docs/t-ujiie-g/draco)，[源码树 ec59de5e](https://github.com/t-ujiie-g/mbt-map/tree/ec59de5e1282f41beb5d8df7012ab65638db8562/ports/draco)：`README.md`、`decode.mbt`、`decode_test.mbt`|Draco 网格与点云压缩解码，输出索引和属性，不提供 LAS 文件读写、VLR/EVLR、回波语义和波形引用保留；可邻接使用，不是相同格式的直接替代。|
+|[`t-ujiie-g/lepcc@0.1.0`](https://mooncakes.io/docs/t-ujiie-g/lepcc)，[同一源码树](https://github.com/t-ujiie-g/mbt-map/tree/ec59de5e1282f41beb5d8df7012ab65638db8562/ports/lepcc)：`README.md`、`xyz.mbt`、`decode_wbtest.mbt`|I3S 场景中 LEPCC XYZ/RGB/intensity 缓冲区解码；不是 LASF 容器与属性/元数据保持型编辑器，也没有编码器。|
+
+永久项目登记表相关指纹仍包含 MoonLAS 自身、MoonWell 井测文本和通用点云几何/空间索引，未在这些条目发现同一 LAS 工作流。GitHub 反向 `LASF language:MoonBit` 返回 17 项且 `incomplete_results=false`；逐项路径涉及 atlas/字体/常量/媒体及压缩样本，未显示新的 LAS 点记录 IO 实现。搜索索引可能滞后，不能从未出现本项目反推其不存在。
+
+原始 JSON 和所读精确版本源码保留于仓库外的本地验收证据目录。raw.githubusercontent.com 传输重置后，改用 GitHub contents API 读取相同 SHA，未将失败当作已阅读。综合历史功能矩阵及本次新增近邻，**在已检查范围内未确认成熟直接重复**；这不是官方查重裁决，也不覆盖所有未索引仓库。
